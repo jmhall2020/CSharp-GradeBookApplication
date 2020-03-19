@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GradeBook.GradeBooks
@@ -15,37 +16,21 @@ namespace GradeBook.GradeBooks
         {
             if (Students.Count < 5)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Ranked-grading requires a minimum of 5 students.");
             }
+            var threshold = (int)Math.Ceiling(Students.Count * 0.2);   //cast to integer and round up to whole #
+            var grades = Students.OrderByDescending(e => e.AverageGrade).Select(e=> e.AverageGrade).ToList();
 
-            //here
-            //create an array of average scores by iterating through Students, 
-            //the List of student objects.
-
-            double[] avgGrades = new double[Students.Count];
-
-            for  (int i = 0; i <= Students.Count; i++)
-            {
-                avgGrades[i] = Students[i].AverageGrade;
-            }
-
-            Array.Sort(avgGrades);
-            Array.Reverse(avgGrades, 0, Students.Count);
-            var x = (Students.Count / 5) - 1;    //needed to account for zero index?  OK?????
-
-
-            if (averageGrade >= avgGrades[x])
-            {
+            if (grades[threshold - 1] <= averageGrade)
                 return 'A';
-            }
-
-
-            //x = top 20% = A
-            //x * 2 = top 40% = B
-            //x * 3 = top 60% = C
-
-
-            return 'F';
+            else if (grades[(threshold * 2) - 1] <= averageGrade)
+                return 'B';
+            else if (grades[(threshold * 3) - 1] <= averageGrade)
+                return 'C';
+            else if (grades[(threshold * 4) - 1) <= averageGrade)
+                return 'D';
+            else
+                return 'F';
         }
     }
 }
